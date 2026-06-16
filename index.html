@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rank2College | JOSAA Predictor</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 2.5rem; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        header { text-align: center; margin-bottom: 2.5rem; }
+        header h1 { color: #1e293b; font-size: 2rem; letter-spacing: -0.5px; margin-bottom: 0.25rem; }
+        header p { color: var(--text-muted); font-size: 1rem; }
+
+        .main-content { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
+        .form-card, .results-card { background: var(--card-bg); padding: 2rem; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        
+        .form-group { margin-bottom: 1.25rem; }
+        label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--text-muted); letter-spacing: 0.05em; }
+        input, select { width: 100%; padding: 0.65rem; border: 1px solid var(--border); border-radius: 5px; font-size: 0.95rem; background: var(--accent); }
+        
+        button { width: 100%; padding: 0.8rem; background-color: var(--primary); color: white; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 0.5rem; }
+        button:hover { background-color: var(--primary-hover); }
+
+        /* Fixed Table Layout with Wrapping Text */
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; table-layout: fixed; }
+        th { 
+            text-align: left; padding: 0.75rem; border-bottom: 2px solid var(--border); 
+            color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; 
+        }
+        td { 
+            padding: 1rem 0.75rem; border-bottom: 1px solid var(--border); 
+            font-size: 0.85rem; 
+            white-space: normal; /* Allows text to wrap to the next line */
+            word-wrap: break-word; 
+            vertical-align: middle; 
+        }
+        
+        /* Optimized 6 Column Widths */
+      /* Slightly adjusted widths to give the Chance column more room */
+        th:nth-child(1), td:nth-child(1) { width: 30%; } /* Institute */
+        th:nth-child(2), td:nth-child(2) { width: 26%; } /* Branch */
+        th:nth-child(3), td:nth-child(3) { width: 8%; }  /* Quota */
+        th:nth-child(4), td:nth-child(4) { width: 10%; } /* Seat */
+        th:nth-child(5), td:nth-child(5) { width: 12%; } /* Rank */
+        th:nth-child(6), td:nth-child(6) { width: 14%; } /* Chance */
+        
+        /* Updated badge with white-space: nowrap to prevent text breaking */
+        .badge { 
+            padding: 0.25rem 0.6rem; 
+            border-radius: 4px; 
+            font-size: 0.72rem; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            display: inline-block; 
+            white-space: nowrap; /* This forces the badge text to stay on one line */
+            text-align: center;
+        }
+        .safe { background: #dcfce7; color: #166534; }
+        .likely { background: #fef9c3; color: #854d0e; }
+        .moderate { background: #ffedd5; color: #9a3412; }
+        .stretch { background: #fee2e2; color: #991b1b; }
+        
+        /* Footer Styling */
+        .footer { background: #f8fafc; border-top: 1px solid var(--border); padding: 2.5rem 0; margin-top: 4rem; color: var(--text-muted); }
+        .footer-content { max-width: 800px; text-align: center; margin: 0 auto; }
+        .disclaimer h3 { font-size: 0.85rem; text-transform: uppercase; margin-bottom: 0.75rem; color: var(--text-main); letter-spacing: 0.05em; }
+        .disclaimer p { font-size: 0.8rem; margin-bottom: 0.5rem; }
+        .copyright { margin-top: 1.5rem; font-size: 0.75rem; }
+        .copyright a { color: var(--primary); text-decoration: none; margin: 0 0.5rem; cursor: pointer; }
+        .copyright a:hover { text-decoration: underline; }
+
+        /* Modal Styling */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 10% auto; padding: 2.5rem; width: 90%; max-width: 600px; border-radius: 8px; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal-content h2 { color: var(--text-main); margin-bottom: 1rem; }
+        .close { position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 1.5rem; color: var(--text-muted); }
+        .close:hover { color: var(--text-main); }
+
+        @media (max-width: 768px) { .main-content { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Rank2College</h1>
+            <p>JOSAA Seat Allocation Analytics</p>
+        </header>
+
+        <div class="main-content">
+            <div class="form-card">
+                <form id="predictorForm">
+                    <div class="form-group">
+                        <label>Exam Type</label>
+                        <select id="examType" required>
+                            <option value="1">JEE Mains (NIT/IIIT/GFTI)</option>
+                            <option value="2">JEE Advanced (IIT)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>CRL Rank</label>
+                        <input type="number" id="crlRank" required min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="category" required>
+                            <option value="OPEN">OPEN</option>
+                            <option value="EWS">EWS</option>
+                            <option value="OBC-NCL">OBC-NCL</option>
+                            <option value="SC">SC</option>
+                            <option value="ST">ST</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Category Rank</label>
+                        <input type="number" id="catRank" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender</label>
+                        <select id="gender" required>
+                            <option value="neutral">Gender-Neutral</option>
+                            <option value="female">Female-only</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quota</label>
+                        <select id="quota">
+                            <option value="HS">Home State</option>
+                            <option value="OS">Outside State</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Branch Keyword</label>
+                        <input type="text" id="branchKeyword" placeholder="e.g. Computer Science">
+                    </div>
+                    <button type="submit" id="submitBtn">Analyze Prospects</button>
+                </form>
+            </div>
+
+            <div class="results-card">
+                <h2>Prediction Results</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Institute</th>
+                                <th>Branch</th>
+                                <th>Quota</th>
+                                <th>Seat Type</th>
+                                <th>Rank</th>
+                                <th>Chance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Enter details to begin analysis.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="disclaimer">
+                <h3>Terms & Privacy</h3>
+                <p>
+                    <strong>Disclaimer:</strong> This tool uses historical JOSAA data for guidance only. Predictions are not guaranteed and should not be used as official counseling advice.
+                </p>
+                <p class="copyright">
+                    © 2026 Rank2College . All rights reserved. 
+                    <a onclick="openModal('privacyModal')">Privacy Policy</a> | <a onclick="openModal('termsModal')">Terms of Service</a>
+                </p> 
+                <p>
+                    Made with ❤️ by <a href="https://in.linkedin.com/in/shubhankar-ambasta-86948a329"target="blank " style="color: rgb(45, 45, 255);" ><h>shubhankar</h></a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="privacyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('privacyModal')">&times;</span>
+            <h2>Privacy Policy</h2>
+            <p>At Rank2College, we value your privacy. Your data (ranks, categories, choices) is processed strictly locally to generate predictions. We do not store, track, or share any of your personal input with third parties.</p>
+        </div>
+    </div>
+
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('termsModal')">&times;</span>
+            <h2>Terms of Service</h2>
+            <p>This application is intended for educational and informational purposes only. Admissions are entirely subject to official JOSAA/CSAB guidelines. We assume no liability for any academic or counseling decisions made based on this tool.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

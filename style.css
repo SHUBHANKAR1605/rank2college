@@ -1,0 +1,68 @@
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 1rem; 
+    table-layout: fixed; /* This forces the table to respect column widths */
+}
+th { 
+    text-align: left; 
+    padding: 0.75rem; 
+    border-bottom: 2px solid var(--border); 
+    color: var(--text-muted); 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+}
+td { 
+    padding: 1rem 0.75rem; 
+    border-bottom: 1px solid var(--border); 
+    font-size: 0.85rem; 
+    word-wrap: break-word; /* This stops long names from breaking the alignment */
+}
+
+/* Specific column widths */
+th:nth-child(1), td:nth-child(1) { width: 30%; } /* Institute */
+th:nth-child(2), td:nth-child(2) { width: 30%; } /* Branch */
+th:nth-child(3), td:nth-child(3) { width: 10%; } /* Quota */
+th:nth-child(4), td:nth-child(4) { width: 15%; } /* Rank */
+th:nth-child(5), td:nth-child(5) { width: 15%; } /* Chance */
+/* Footer Styling */
+.footer {
+    background: #f8fafc;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 0;
+    margin-top: 4rem;
+    color: var(--text-muted);
+}
+
+.footer-content {
+    max-width: 800px;
+    text-align: center;
+}
+
+.disclaimer h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+    letter-spacing: 0.05em;
+}
+
+.disclaimer p {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.copyright {
+    margin-top: 1.5rem;
+    font-size: 0.75rem;
+}
+
+.copyright a {
+    color: var(--primary);
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
+
+.copyright a:hover {
+    text-decoration: underline;
+}
