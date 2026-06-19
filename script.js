@@ -29,7 +29,8 @@ document.getElementById('predictorForm').addEventListener('submit', async functi
     tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Fetching +/- 10% Window...</td></tr>`;
 
     try {
-        const response = await fetch('http://localhost:3000/api/predict', {
+        // 👇 THIS IS YOUR LIVE RENDER SERVER LINK 👇
+        const response = await fetch('https://rank2college-8rku.onrender.com/api/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -41,7 +42,8 @@ document.getElementById('predictorForm').addEventListener('submit', async functi
         renderDatabaseTable(realDatabaseRows);
         
     } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #dc2626; font-weight: 500;">Could not reach local server. Ensure "node server.js" is running in your terminal window.</td></tr>`;
+        // Updated error message for cloud deployment
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #dc2626; font-weight: 500;">Could not reach cloud server. Please try again in a moment.</td></tr>`;
     } finally {
         submitBtn.textContent = "Analyze Prospects";
         submitBtn.style.opacity = "1";
