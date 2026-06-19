@@ -10,10 +10,13 @@ app.use(express.json());
 // Tell MySQL to look in your hidden .env file instead of hardcoding it here
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
-    port: process.env.DB_PORT, // <-- This is the critical line you needed!
+    port: process.env.DB_PORT, 
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD, 
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    ssl: {
+        rejectUnauthorized: false
+    } // <-- This is the new SSL lock Render needs to talk to Aiven!
 });
 
 app.post('/api/predict', (req, res) => {
